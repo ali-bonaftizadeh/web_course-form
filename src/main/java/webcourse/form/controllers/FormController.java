@@ -9,7 +9,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/api/forms")
+@RequestMapping("/api/form")
 public class FormController {
 
     private final FormService formService;
