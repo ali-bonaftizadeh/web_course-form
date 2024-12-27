@@ -1,15 +1,14 @@
 package webcourse.form.controllers;
 
-import webcourse.form.models.Field;
-import webcourse.form.models.Form;
-import org.springframework.web.bind.annotation.*;
+import webcourse.form.dto.FormDto;
+import webcourse.form.dto.FieldDto;
 import webcourse.form.services.FormService;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-
 @RestController
-@RequestMapping("/api/form")
+@RequestMapping("/forms")
 public class FormController {
 
     private final FormService formService;
@@ -19,44 +18,37 @@ public class FormController {
     }
 
     @GetMapping
-    public List<Form> getAllForms() {
+    public List<FormDto> getAllForms() {
         return formService.getAllForms();
     }
 
     @PostMapping
-    public Form createForm(
-            @RequestBody Form form) {
-        return formService.createForm(form);
+    public FormDto createForm(@RequestBody FormDto formDto) {
+        return formService.createForm(formDto);
     }
 
     @GetMapping("/{id}")
-    public Form getForm(
-            @PathVariable Long id) {
+    public FormDto getForm(@PathVariable Long id) {
         return formService.getForm(id);
     }
 
     @PutMapping("/{id}")
-    public Form updateForm(
-            @PathVariable Long id,
-            @RequestBody Form form) {
-        return formService.updateForm(id, form);
+    public FormDto updateForm(@PathVariable Long id, @RequestBody FormDto formDto) {
+        return formService.updateForm(id, formDto);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteForm(
-            @PathVariable Long id) {
+    public void deleteForm(@PathVariable Long id) {
         formService.deleteForm(id);
     }
 
     @PostMapping("/{id}/publish")
-    public void publishForm(
-            @PathVariable Long id) {
+    public void publishForm(@PathVariable Long id) {
         formService.publishForm(id);
     }
 
     @GetMapping("/{id}/fields")
-    public List<Field> getFieldsForForm(
-            @PathVariable Long id) {
+    public List<FieldDto> getFieldsForForm(@PathVariable Long id) {
         return formService.getFieldsForForm(id);
     }
 }

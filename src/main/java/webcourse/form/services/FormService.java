@@ -1,55 +1,82 @@
 package webcourse.form.services;
 
-import webcourse.form.exceptions.ResourceNotFoundException;
-import lombok.RequiredArgsConstructor;
-import webcourse.form.models.Field;
+import webcourse.form.dto.FormDto;
+import webcourse.form.dto.FieldDto;
 import webcourse.form.models.Form;
 import org.springframework.stereotype.Service;
-import webcourse.form.repositories.FieldRepository;
-import webcourse.form.repositories.FormRepository;
 
+import java.util.ArrayList;
 import java.util.List;
-
+import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class FormService {
 
-    private final FormRepository formRepository;
-    private final FieldRepository fieldRepository;
+    // Mock data for demonstration
+    private final List<Form> forms = new ArrayList<>();
 
-    public Form createForm(Form form) {
-        return formRepository.save(form);
+    public List<FormDto> getAllForms() {
+        // Convert entities to DTOs
+        return forms.stream()
+                .map(form -> new FormDto(form.getId(), form.getName(), form.isPublished()))
+                .collect(Collectors.toList());
     }
 
-    public Form getForm(Long id) {
-        return formRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Form not found"));
+    public FormDto createForm(FormDto formDto) {
+        // Convert DTO to entity, save it, then return the saved entity as DTO
+        Form form = Form.builder().id(formDto.getId()).name(formDto.getName())
+                .published(formDto.isPublished()).build();
+        forms.add(form);
+        return new FormDto(form.getId(), form.getName(), form.isPublished());
     }
 
-    public List<Form> getAllForms() {
-        return formRepository.findAll();
+    public FormDto getForm(Long id) {
+        // Find the form by ID and convert it to a DTO
+        Form form = forms.stream()
+                .filter(f -> f.getId().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Form not found"));
+        return new FormDto(form.getId(), form.getName(), form.isPublished());
     }
 
-    public Form updateForm(Long id, Form formDetails) {
-        Form form = formRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Form not found"));
-        form.setName(formDetails.getName());
-        form.setPublished(formDetails.isPublished());
-        return formRepository.save(form);
+    public FormDto updateForm(Long id, FormDto formDto) {
+        // Find the form, update its fields, and convert it back to a DTO
+        Form form = forms.stream()
+                .filter(f -> f.getId().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Form not found"));
+
+        form.setName(formDto.getName());
+        form.setPublished(formDto.isPublished());
+
+        return new FormDto(form.getId(), form.getName(), form.isPublished());
     }
 
     public void deleteForm(Long id) {
-        Form form = formRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Form not found"));
-        formRepository.delete(form);
+        // Remove the form by ID
+        forms.removeIf(form -> form.getId().equals(id));
     }
 
-    public List<Field> getFieldsForForm(Long formId) {
-        return fieldRepository.findByFormId(formId);
-    }
+    public void publishForm(Long id) {
+        // Find the form and mark it as published
+        Form form = forms.stream()
+                .filter(f -> f.getId().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Form not found"));
 
-    public void publishForm(Long formId) {
-        Form form = formRepository.findById(formId).orElseThrow(() -> new ResourceNotFoundException("Form not found"));
         form.setPublished(true);
-        formRepository.save(form);
+    }
+
+    public List<FieldDto> getFieldsForForm(Long formId) {
+        // For demonstration, we assume each form has fields
+        Form form = forms.stream()
+                .filter(f -> f.getId().equals(formId))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Form not found"));
+
+        return form.getFields().stream()
+                .map(field -> new FieldDto(
+                        field.getId(), field.getName(), field.getType(), field.getLabel(), field.getDefaultValue()))
+                .collect(Collectors.toList());
     }
 }
-
