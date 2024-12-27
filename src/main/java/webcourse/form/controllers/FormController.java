@@ -1,15 +1,15 @@
-package controllers;
+package webcourse.form.controllers;
 
-import models.Field;
-import models.Form;
+import webcourse.form.models.Field;
+import webcourse.form.models.Form;
 import org.springframework.web.bind.annotation.*;
-import services.FormService;
+import webcourse.form.services.FormService;
 
 import java.util.List;
 
 
 @RestController
-@RequestMapping("/forms")
+@RequestMapping("/api/forms")
 public class FormController {
 
     private final FormService formService;

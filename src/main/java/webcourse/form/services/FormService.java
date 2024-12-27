@@ -1,18 +1,18 @@
-package services;
+package webcourse.form.services;
 
-import exceptions.ResourceNotFoundException;
+import webcourse.form.exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
-import models.Field;
-import models.Form;
+import webcourse.form.models.Field;
+import webcourse.form.models.Form;
 import org.springframework.stereotype.Service;
-import repositories.FieldRepository;
-import repositories.FormRepository;
+import webcourse.form.repositories.FieldRepository;
+import webcourse.form.repositories.FormRepository;
 
 import java.util.List;
 
 
 @Service
-@RequiredArgsConstructor // Lombok generates constructor for final fields
+@RequiredArgsConstructor
 public class FormService {
 
     private final FormRepository formRepository;

@@ -1,6 +1,6 @@
-package repositories;
+package webcourse.form.repositories;
 
-import models.Field;
+import webcourse.form.models.Field;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

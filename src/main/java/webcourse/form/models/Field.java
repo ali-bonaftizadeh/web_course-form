@@ -1,4 +1,4 @@
-package models;
+package webcourse.form.models;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.ToString;
 
-import java.util.List;
 
 @Entity
 @Getter
@@ -15,16 +14,18 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class Form {
+public class Field {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
-    private boolean published;
+    private String type;
+    private String label;
+    private String defaultValue;
 
-    @OneToMany(mappedBy = "form", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Field> fields;
+    @ManyToOne
+    @JoinColumn(name = "form_id")
+    private Form form;
 }
-
