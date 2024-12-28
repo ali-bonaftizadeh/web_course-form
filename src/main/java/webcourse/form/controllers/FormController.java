@@ -2,6 +2,7 @@ package webcourse.form.controllers;
 
 import webcourse.form.dto.FormDto;
 import webcourse.form.dto.FieldDto;
+import webcourse.form.dto.FormRequestDto;
 import webcourse.form.services.FormService;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,7 +24,7 @@ public class FormController {
     }
 
     @PostMapping
-    public FormDto createForm(@RequestBody FormDto formDto) {
+    public FormDto createForm(@RequestBody FormRequestDto formDto) {
         return formService.createForm(formDto);
     }
 
@@ -33,7 +34,7 @@ public class FormController {
     }
 
     @PutMapping("/{id}")
-    public FormDto updateForm(@PathVariable Long id, @RequestBody FormDto formDto) {
+    public FormDto updateForm(@PathVariable Long id, @RequestBody FormRequestDto formDto) {
         return formService.updateForm(id, formDto);
     }
 
@@ -42,13 +43,18 @@ public class FormController {
         formService.deleteForm(id);
     }
 
+    @GetMapping("/{id}/fields")
+    public List<FieldDto> getFieldsForForm(@PathVariable Long id) {
+        return formService.getFieldsForForm(id);
+    }
+
     @PostMapping("/{id}/publish")
     public void publishForm(@PathVariable Long id) {
         formService.publishForm(id);
     }
 
-    @GetMapping("/{id}/fields")
-    public List<FieldDto> getFieldsForForm(@PathVariable Long id) {
-        return formService.getFieldsForForm(id);
+    @PostMapping("/published")
+    public List<FormDto> getPublishedForms() {
+        return formService.getAllPublishedForms();
     }
 }

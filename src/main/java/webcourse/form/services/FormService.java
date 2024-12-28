@@ -1,82 +1,102 @@
 package webcourse.form.services;
 
-import webcourse.form.dto.FormDto;
 import webcourse.form.dto.FieldDto;
+import webcourse.form.dto.FieldRequestDto;
+import webcourse.form.dto.FormDto;
+import webcourse.form.dto.FormRequestDto;
+import webcourse.form.exceptions.ResourceNotFoundException;
+import lombok.RequiredArgsConstructor;
+import webcourse.form.models.Field;
 import webcourse.form.models.Form;
 import org.springframework.stereotype.Service;
+import webcourse.form.repositories.FieldRepository;
+import webcourse.form.repositories.FormRepository;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Service
+@RequiredArgsConstructor
 public class FormService {
 
-    // Mock data for demonstration
-    private final List<Form> forms = new ArrayList<>();
+    private final FormRepository formRepository;
+    private final FieldRepository fieldRepository;
 
-    public List<FormDto> getAllForms() {
-        // Convert entities to DTOs
-        return forms.stream()
-                .map(form -> new FormDto(form.getId(), form.getName(), form.isPublished()))
-                .collect(Collectors.toList());
-    }
-
-    public FormDto createForm(FormDto formDto) {
-        // Convert DTO to entity, save it, then return the saved entity as DTO
-        Form form = Form.builder().id(formDto.getId()).name(formDto.getName())
-                .published(formDto.isPublished()).build();
-        forms.add(form);
-        return new FormDto(form.getId(), form.getName(), form.isPublished());
+    public FormDto createForm(FormRequestDto form) {
+        Form formEntity = formMapper(form);
+        formEntity.getFields().forEach(field -> field.setForm(formEntity));
+        return formMapper(formRepository.save(formEntity));
     }
 
     public FormDto getForm(Long id) {
-        // Find the form by ID and convert it to a DTO
-        Form form = forms.stream()
-                .filter(f -> f.getId().equals(id))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Form not found"));
-        return new FormDto(form.getId(), form.getName(), form.isPublished());
+        return formMapper(formRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Form not found")));
     }
 
-    public FormDto updateForm(Long id, FormDto formDto) {
-        // Find the form, update its fields, and convert it back to a DTO
-        Form form = forms.stream()
-                .filter(f -> f.getId().equals(id))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Form not found"));
+    public List<FormDto> getAllForms() {
+        return formRepository.findAll().stream().map(this::formMapper).toList();
+    }
 
-        form.setName(formDto.getName());
-        form.setPublished(formDto.isPublished());
+    public List<FormDto> getAllPublishedForms() {
+        return formRepository.findAllByPublishedTrue().stream().map(this::formMapper).toList();
+    }
 
-        return new FormDto(form.getId(), form.getName(), form.isPublished());
+    public FormDto updateForm(Long id, FormRequestDto formDetails) {
+        Form form = formRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Form not found"));
+        form.setName(formDetails.getName());
+        form.setPublished(formDetails.isPublished());
+        form.setFields(formDetails.getFields().stream().map(this::fieldMapper).toList());
+        return formMapper(formRepository.save(form));
     }
 
     public void deleteForm(Long id) {
-        // Remove the form by ID
-        forms.removeIf(form -> form.getId().equals(id));
-    }
-
-    public void publishForm(Long id) {
-        // Find the form and mark it as published
-        Form form = forms.stream()
-                .filter(f -> f.getId().equals(id))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Form not found"));
-
-        form.setPublished(true);
+        Form form = formRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Form not found"));
+        formRepository.delete(form);
     }
 
     public List<FieldDto> getFieldsForForm(Long formId) {
-        // For demonstration, we assume each form has fields
-        Form form = forms.stream()
-                .filter(f -> f.getId().equals(formId))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Form not found"));
+        List<Field> fieldsByFormId = fieldRepository.findByFormId(formId);
+        return fieldsByFormId.stream().map(this::fieldMapper).toList();
+    }
 
-        return form.getFields().stream()
-                .map(field -> new FieldDto(
-                        field.getId(), field.getName(), field.getType(), field.getLabel(), field.getDefaultValue()))
-                .collect(Collectors.toList());
+    public void publishForm(Long formId) {
+        Form form = formRepository.findById(formId).orElseThrow(() -> new ResourceNotFoundException("Form not found"));
+        form.setPublished(true);
+        formRepository.save(form);
+    }
+
+    public FormDto formMapper(Form form){
+        return FormDto.builder()
+                .name(form.getName())
+                .id(form.getId())
+                .published(form.isPublished())
+                .fields(form.getFields().stream().map(this::fieldMapper).toList())
+                .build();
+    }
+
+    public Form formMapper(FormRequestDto form){
+        return Form.builder()
+                .name(form.getName())
+                .published(form.isPublished())
+                .fields(form.getFields().stream().map(this::fieldMapper).toList())
+                .build();
+    }
+
+    public FieldDto fieldMapper(Field field){
+        return FieldDto.builder()
+                .label(field.getLabel())
+                .type(field.getType())
+                .defaultValue(field.getDefaultValue())
+                .name(field.getName())
+                .id(field.getId()).build();
+    }
+
+    public Field fieldMapper(FieldRequestDto field){
+        return Field.builder()
+                .label(field.getLabel())
+                .type(field.getType())
+                .defaultValue(field.getDefaultValue())
+                .name(field.getName())
+                .build();
     }
 }
+

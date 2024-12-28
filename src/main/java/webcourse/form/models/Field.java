@@ -1,11 +1,8 @@
 package webcourse.form.models;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import lombok.ToString;
+import lombok.*;
+import webcourse.form.enums.FieldType;
 
 
 @Entity
@@ -14,6 +11,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@Builder
 public class Field {
 
     @Id
@@ -21,8 +19,11 @@ public class Field {
     private Long id;
 
     private String name;
-    private String type;
+
+    private FieldType type;
+
     private String label;
+
     private String defaultValue;
 
     @ManyToOne

@@ -19,9 +19,10 @@ public class Form {
     private Long id;
 
     private String name;
+
     private boolean published;
 
-    @OneToMany(mappedBy = "form", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "form", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Field> fields;
 }
 

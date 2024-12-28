@@ -4,16 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
+import webcourse.form.enums.FieldType;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class FormDto {
-    private Long id;
+public class FieldRequestDto {
     private String name;
-    private boolean published;
-    private List<FieldDto> fields;
+    private FieldType type;
+    private String label;
+    private String defaultValue;
 }

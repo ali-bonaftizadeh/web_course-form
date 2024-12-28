@@ -11,9 +11,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class FormDto {
-    private Long id;
+public class FormRequestDto {
     private String name;
     private boolean published;
-    private List<FieldDto> fields;
+    private List<FieldRequestDto> fields;
 }
