@@ -41,9 +41,23 @@ public class FormService {
     }
 
     public FormDto updateForm(Long id, FormRequestDto formDetails) {
-        formRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Form not found"));
-        formRepository.deleteById(id);
-        return createForm(formDetails);
+        Form existingForm = formRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Form not found"));
+
+        existingForm.setName(formDetails.getName());
+        existingForm.setPublished(formDetails.isPublished());
+
+        existingForm.getFields().clear();
+
+        List<Field> updatedFields = formDetails.getFields().stream()
+                .map(this::fieldMapper)
+                .peek(field -> field.setForm(existingForm))
+                .toList();
+        existingForm.getFields().addAll(updatedFields);
+
+        Form savedForm = formRepository.save(existingForm);
+
+        return formMapper(savedForm);
     }
 
     public void deleteForm(Long id) {
