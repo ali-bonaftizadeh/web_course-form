@@ -53,7 +53,7 @@ public class FormController {
         formService.publishForm(id);
     }
 
-    @PostMapping("/published")
+    @GetMapping("/published")
     public List<FormDto> getPublishedForms() {
         return formService.getAllPublishedForms();
     }
